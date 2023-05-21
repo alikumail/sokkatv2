@@ -1,32 +1,61 @@
-const shopify = require('../services/shopify');
+const shopify = require("../services/shopify");
 const Customer = require("../models/Customer");
 const Order = require("../models/Order");
 
 // Define a function to create a new order
 async function createOrder(req, res) {
-    try {
-      // Get the order data from the request body
-      const { line_items, customer, shipping_address, billing_address, total_price } = req.body;
-  
-      // Create the order on the Shopify store
-      const order = await shopify.order.create({
-        line_items,
-        customer,
-        shipping_address,
-        billing_address,
-        total_price,
-      });
-  
-      // Send the created order back in the response
-      res.status(201).json(order);
-    } catch (err) {
-      // Handle errors and send an error response
-      console.error('Failed to create order:', err);
-      res.status(500).json({ error: 'Failed to create order' });
-    }
+  try {
+    // get data from body
+    const { customerId, lineItems } = req.body;
+
+    // get customer from data base
+    const customer = await Customer.findById(customerId);
+    
+    // create order on shopify store
+    const shopifyOrder = await shopify.order.create({
+      customer: "7011102818610",
+      line_items: lineItems,
+    });
+
+    const order = new Order({
+      orderId: shopifyOrder.id,
+      shopify_id: customer.shopify_id,
+      totalPrice: shopifyOrder.current_subtotal_price,
+      lineItems: lineItems,
+
+    });
+
+    await order.save();
+
+    return res.status(201).json(shopifyOrder);
+
+  } catch (error) {
+
+    console.error(error);
+    return res.status(500).json({ error: "Failed to create order" });
+    
   }
+}
+
+
+// get order from store
+async function getOrders(req, res, next){
+  try{
+
+    let params = { limit: 5 };
+    const orders = await shopify.order.list(params);
+    res.status(200).json(orders);
+
+  }catch(err){
+
+    console.error(err);
+    return res.status(500).json({ error: "Failed to get orders" });
+
+  }
+}
 
 
 module.exports = {
-    createOrder,
+  createOrder,
+  getOrders,
 };

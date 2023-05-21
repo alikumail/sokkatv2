@@ -92,18 +92,8 @@ async function registerCustomer(req, res, next) {
 
     await customer.save();
 
-    res.status(200).json(customer);
+    res.status(200).json(shopifyCustomer);
 
-    // const shopifyCustomer = await shopify.customer.create({
-    //   "first_name": "Steve",
-    //   "last_name": "Lastnameson",
-    //   "email": "steve.lastnameson@example.com",
-    //   "phone": "+15142546011",
-    //   "verified_email": true,
-    //   "password": password,
-    //   "password_confirmation": password,
-    //   "send_email_welcome": false
-    // });
   } catch (err) {
     // Handle errors and send an error response
     console.error("Failed to create customer:", err);

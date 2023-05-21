@@ -5,10 +5,10 @@ const profileSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Customer",
   },
-  first_name: {
+  firstName: {
     type: String,
   },
-  last_name: {
+  lastName: {
     type: String,
   },
   address: {

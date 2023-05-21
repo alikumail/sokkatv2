@@ -27,5 +27,6 @@ router.route('/logout').post(controller.logout);
 router.route('/profile').post(controller.registerCustomer);
 
 // updating profile
+router.route('/profile').put(controller.registerCustomer);
 
 module.exports = router;
