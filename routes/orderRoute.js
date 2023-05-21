@@ -6,6 +6,12 @@ const controller = require('../controllers/orderController');
 router.route('/add').post(controller.createOrder);
 
 // get orders from shopify store
-router.route('/').get(controller.getOrders);
+router.route('/:id').get(controller.getOrders);
+
+// cancel order in shopify store
+router.route('/:orderId/cancel').put(controller.cancelOrder);
+
+// delete order from shopify store and mongodb
+router.route('/:orderId').delete(controller.deleteOrder);
 
 module.exports = router;
