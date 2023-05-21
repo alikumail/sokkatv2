@@ -2,6 +2,16 @@
 const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
+  shopify_id: {
+    type: String,
+    unique: true
+  },
+  firstName: {
+    type: String,
+  },
+  lastName: {
+    type: String,
+  },
   phone: {
     type: String,
     required: true,
@@ -12,7 +22,8 @@ const customerSchema = new mongoose.Schema({
     required: true
   },
   email: {
-    type: String
+    type: String,
+    required: true
   },
   device_id: {
     type: String,
