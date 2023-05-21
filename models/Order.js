@@ -1,35 +1,21 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-  orderId: {
+  order_id: {
     type: Number,
     required: true,
     unique: true,
   },
   shopify_id: {
-    type: String,
-    required: true,
-  },
-  totalPrice: {
     type: Number,
     required: true,
+    unique: true,
   },
-  lineItems: [
-    {
-      productId: {
-        type: String,
-        required: true,
-      },
-      quantity: {
-        type: Number,
-        required: true,
-      },
-      price: {
-        type: Number,
-        required: true,
-      },
-    },
-  ],
+  customer_id:{
+    type: String,
+    required: true,
+    unique: true
+  },
   createdAt: {
     type: Date,
     default: Date.now,

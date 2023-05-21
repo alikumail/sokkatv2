@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
   shopify_id: {
-    type: String,
+    type: Number,
     unique: true
   },
   firstName: {
