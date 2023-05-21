@@ -1,0 +1,23 @@
+{
+  "name": "connection",
+  "version": "1.0.0",
+  "description": "connection with shopify",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "hassan",
+  "license": "ISC",
+  "dependencies": {
+    "@trycourier/courier": "^4.2.0",
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "isomorphic-webcrypto": "^2.3.8",
+    "mongoose": "^7.1.0",
+    "nodemon": "^2.0.22",
+    "otp-generator": "^4.0.1",
+    "shopify-api-node": "^3.12.4"
+  }
+}
