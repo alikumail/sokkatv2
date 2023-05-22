@@ -90,7 +90,7 @@ async function deleteOrder(req, res, next){
 }
 
 // Update an order
-async function updatedOrder(req, res, next){
+async function updateOrder(req, res, next){
   try {
 
     const { orderId } = req.params;
@@ -104,7 +104,7 @@ async function updatedOrder(req, res, next){
 
     console.error(error);
     res.status(500).json({ error: 'Failed to update order' });
-    
+
   }
 }
 

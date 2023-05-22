@@ -8,6 +8,11 @@ const shopify = require('./services/shopify');
 //---------Importing Routes------------//
 const customerRoute = require('./routes/customerRoute');
 const orderRoute = require('./routes/orderRoute');
+const addressRoute = require('./routes/addressRoute');
+const cartRoute = require('./routes/cartRoute');
+const productRoute = require('./routes/productRoute');
+const discountRoute = require('./routes/discountRoute');
+const collectionRoute = require('./routes/collectionRoute');
 
 //--------- express app instantiation------------//
 const app = express();
@@ -31,8 +36,15 @@ app.use(cors({
 //------- API's --------//
 app.use('/api/v1/customer', customerRoute);
 app.use('/api/v1/order', orderRoute);
+app.use('/api/address', addressRoute);
+app.use('/api/v1/product', productRoute);
+app.use('/api/v1/faqs', FAQsRoute);
+app.use('/api/v1/shipping', shippingRoute);
+app.use('/api/v1/cart', cartRoute);
+app.use('/api/v1/discount', discountRoute);
+app.use('/api/v1/collection', collectionRoute);
 
-app.use((err,req,res,next)=>{
+app.use((req,res,next)=>{
   res.status(err.statusCode || 500).json({
     error: {
       message: err.message || 'Internal Server Error'
