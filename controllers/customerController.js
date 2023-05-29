@@ -8,7 +8,7 @@ const shopify = require("../services/shopify");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
-// Login Api for customer
+// Login Api for customer -----------------------------//
 async function loginCustomer(req, res, next) {
   try {
     // getting info from body
@@ -39,32 +39,35 @@ async function loginCustomer(req, res, next) {
   }
 }
 
-// register new customer
+// register new customer ---------------------------------------// ok
 async function registerCustomer(req, res, next) {
   try {
     // Get the customer data from the request body
-    const {
-      firstName,
-      lastName,
-      email,
-      phone,
-      password,
-      device_id,
-      device_type,
-      language,
-    } = req.body;
+    const { firstName,lastName,email,phone,country,city,password,device_id,device_type,language, } = req.body;
 
     // check if data exist
-    if ( !firstName || !lastName || !email || !phone || !password || !device_id || !device_type || !language) {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone ||
+      !password ||
+      !device_id ||
+      !device_type ||
+      !language
+    ) {
+
       return next(
-        new errorHandler("Information is Missing", "Missing Data Error", 404)
+        res.status(402).json("Information is Missing", "Missing Data Error", 404)
       );
+
     }
 
+    // creating customer in shopify store
     const shopifyCustomer = await shopify.customer.create({
       first_name: firstName,
       last_name: lastName,
-      email,
+      email: email,
     });
 
     // HAshing the password
@@ -79,11 +82,10 @@ async function registerCustomer(req, res, next) {
     // Create the order on the Shopify store
     const customer = new Customer({
       shopify_id: shopifyCustomer.id,
-      firstName,
-      lastName,
-      email,
       phone,
       password: code,
+      country,
+      city,
       device_id,
       device_type,
       language,
@@ -92,16 +94,37 @@ async function registerCustomer(req, res, next) {
 
     await customer.save();
 
-    res.status(200).json(shopifyCustomer);
+    res.status(200).json(customer);
 
   } catch (err) {
     // Handle errors and send an error response
-    console.error("Failed to create customer:", err);
+    console.error(err);
     res.status(400).json({ error: "Failed to create customer" });
   }
 }
 
-// reset password
+// update customer ----------------------------------- 
+async function updateCustomer(req, res, next){
+  const customerId = req.params.id;
+  // const updateData = req.body;
+  const updateData = {
+    phone: 1234567890 // Replace with the phone number you want to add
+  };
+
+  try {
+
+    const updatedCustomer = await shopify.customer.update(customerId, updateData);
+    res.json(updatedCustomer);
+
+  } catch (error) {
+
+    console.error('Error updating customer:', error);
+    res.status(500).json({ error: 'Failed to update customer' });
+
+  }
+}
+
+// reset password --------------------------------// 
 async function resetPassword(req, res, next) {
   const { code, phone, password, device_id, device_type, language } = req.body;
 
@@ -140,7 +163,76 @@ async function resetPassword(req, res, next) {
   }
 }
 
-// logout api
+// add profile information
+async function createProfile(req, res, next) {
+  try {
+    // Get the customer data from the request body
+    const { customer_id, first_name, last_name, address, device_id, device_type, language } = req.body;
+
+    // check if data exist
+    if (
+      !customer_id ||
+      !first_name ||
+      !last_name ||
+      !address ||
+      !device_id ||
+      !device_type ||
+      !language
+    ) {
+      return next(
+        new errorHandler("Information is Missing", "Missing Data Error", 400)
+      );
+    }
+    // Create the order on db
+    const profile = new Profile({
+      customer_id,
+      first_name,
+      last_name,
+      address,
+    });
+
+    await profile.save();
+
+    // Send the created order back in the response
+    res.status(200).json(profile);
+
+  } catch (err) {
+    // Handle errors and send an error response
+    console.error("Failed an Error Ocurred:", err);
+    res.status(400).json({ error: "Failed an Error Ocurred" });
+  }
+}
+
+// update profile
+async function updateProfile(req, res, next) {
+  try {
+    const { id } = req.params; // Get the profile ID from the URL
+    const params = req.body; // Get the updated data from the request body
+
+    // Find the profile by ID
+    const profile = await Profile.findById(id);
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // Update the profile fields with the new data
+    profile.first_name = first_name || profile.first_name;
+    profile.last_name = last_name || profile.last_name;
+    profile.address = address || profile.address;
+
+    // Save the updated profile
+    await profile.save();
+
+    return res.json(profile);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
+  }
+}
+
+
+// logout api -------------------------------// 
 async function logout(req, res, next) {
   try {
     const { phone, device_id } = req.body;
@@ -168,83 +260,34 @@ async function logout(req, res, next) {
   }
 }
 
-// add profile information
-async function createProfile(req, res, next) {
-  try {
-    // Get the customer data from the request body
-    const {
-      customer_id,
-      first_name,
-      last_name,
-      address,
-      device_id,
-      device_type,
-      language,
-    } = req.body;
-
-    // check if data exist
-    if (
-      !customer_id ||
-      !first_name ||
-      !last_name ||
-      !address ||
-      !device_id ||
-      !device_type ||
-      !language
-    ) {
-      return next(
-        new errorHandler("Information is Missing", "Missing Data Error", 400)
-      );
-    }
-    // Create the order on the Shopify store
-    const profile = new Profile({
-      customer_id,
-      first_name,
-      last_name,
-      address,
-    });
-
-    await profile.save();
-
-    // Send the created order back in the response
-    res.status(200).json(profile);
-  } catch (err) {
-    // Handle errors and send an error response
-    console.error("Failed an Error Ocurred:", err);
-    res.status(400).json({ error: "Failed an Error Ocurred" });
-  }
+// get all customers ------------------------
+async function getAll(req, res){
+  const customers =await shopify.customer.list();
+  res.json(customers);
 }
 
-// update profile
-async function updateProfile(req, res, next) {
-  try {
-    const { id } = req.params; // Get the profile ID from the URL
-    const { first_name, last_name, address } = req.body; // Get the updated data from the request body
 
-    // Find the profile by ID
-    const profile = await Profile.findById(id);
+// delete customer --------------------------
+async function deleteCustomer(req, res){
+  try{
 
-    if (!profile) {
-      return res.status(404).json({ message: "Profile not found" });
-    }
+    const id = req.params.id;
+    await shopify.customer.delete(id);
+    res.json.status(200).json('Customer Deleted Successfully');
+  }catch(error){
 
-    // Update the profile fields with the new data
-    profile.first_name = first_name || profile.first_name;
-    profile.last_name = last_name || profile.last_name;
-    profile.address = address || profile.address;
-
-    // Save the updated profile
-    await profile.save();
-
-    return res.json(profile);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server error");
+    console.log(error);
+    res.status(422).json("Customer not found")
   }
+  
 }
+
 
 module.exports = {
   registerCustomer,
+  updateCustomer,
+  deleteCustomer,
+  getAll,
   loginCustomer,
   resetPassword,
   logout,

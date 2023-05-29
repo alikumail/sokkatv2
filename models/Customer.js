@@ -6,12 +6,6 @@ const customerSchema = new mongoose.Schema({
     type: Number,
     unique: true
   },
-  firstName: {
-    type: String,
-  },
-  lastName: {
-    type: String,
-  },
   phone: {
     type: String,
     required: true,
@@ -21,13 +15,10 @@ const customerSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  email: {
-    type: String,
-    required: true
-  },
+  country: String,
+  city: String,
   device_id: {
-    type: String,
-    required: true
+    type: String
   },
   device_type: {
     type: String,

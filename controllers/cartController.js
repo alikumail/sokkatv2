@@ -3,7 +3,7 @@ const Customer = require("../models/Customer");
 const Cart = require("../models/Cart");
 
 // create new Cart
-async function createCart(req, res){
+async function addCart(req, res){
     try {
         const cartData = req.body; // Assuming the request body contains the cart data
     
@@ -62,7 +62,7 @@ async function deleteCart(req, res){
 
 
 module.exports = {
-  createCart,
+  addCart,
   getCart,
   deleteCart,
   updateCart,

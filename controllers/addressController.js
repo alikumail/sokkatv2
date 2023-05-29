@@ -1,80 +1,141 @@
 const shopify = require("../services/shopify");
+
 const Customer = require("../models/Customer");
 const Address = require("../models/Address");
 
-// create new address
-async function createAddress(req, res){
+// create new address ----------------------------//ok
+async function createAddress(req, res) {
+
   try {
-    const addressData = req.body; // Assuming the request body contains the address data
+
+    const customerId = req.body.customer_id;
+    const addressParams = req.body.params;
 
     // Create the address using the Shopify API
-    const address = await shopify.customerAddress.create(addressData);
+    const address = await shopify.customerAddress.create(customerId,addressParams);
 
-    res.json(address);
+    res.status(200).json(address);
+
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create address' });
+
+    console.log(error);
+  
+    res.status(500).json({ error: "Failed to create address" });
+    
   }
 }
 
-// get address by id
-async function getAddress(req, res){
+// get address by id ----------------------------//ok
+async function getAddress(req, res) {
+
   try {
-    const addressId = req.params.id;
+
+    const id = req.params.id;
+
+    const customerId = req.body.customer_id;
 
     // Get the address using the Shopify API
-    const address = await shopify.customerAddress.get(addressId);
+    const address = await shopify.customerAddress.get(customerId,id);
 
-    res.json(address);
+    res.status(200).json(address);
+
   } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve address' });
+
+    res.status(500).json({ error: "Process Failed" });
+    
   }
 }
 
-async function defaultAddress(req, res){
+// get all addresses --------------------------------//ok
+async function getAllAddress(req, res) {
+
   try {
-    const addressId = req.params.id;
+    const customerId = req.params.id;
+
+    // Get the address using the Shopify API
+    const address = await shopify.customerAddress.list(customerId);
+
+    res.json(address);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to retrieve addresses" });
+    
+  }
+}
+
+// setting default address ----------------------// ok
+async function defaultAddress(req, res) {
+  try {
+    const customerId = req.params.id;
+
+    const id = req.body.address_id;
 
     // Cancel the address using the Shopify API
-    const address = await shopify.customerAddress.defaultAddress(addressId);
+    const address = await shopify.customerAddress.default( customerId, id );
 
     res.json(address);
+
   } catch (error) {
-    res.status(500).json({ error: 'Failed to cancel address' });
+
+    console.log(error);
+    res.status(500).json({ error: "Failed to set default address" });
+
   }
 }
 
-async function deleteAddress(req, res){
+// deleting address -------------------------------// ok
+async function deleteAddress(req, res) {
   try {
-    const addressId = req.params.id;
+
+    const customerId = req.body.customer_id;
+    const id = req.params.id;
 
     // Delete the address using the Shopify API
-    await shopify.customerAddress.delete(addressId);
+    await shopify.customerAddress.delete(customerId, id);
 
-    res.json({ success: true });
+    res.status(200).json({ success: true });
+
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete address' });
+
+    console.log(error);
+    res.status(500).json({ error: "Failed to delete address" });
+
   }
 }
 
-async function updateAddress(req, res){
+// updating address -------------------------------- // ok
+async function updateAddress(req, res) {
   try {
-    const addressId = req.params.id;
-    const addressData = req.body; // Assuming the request body contains the updated address data
+
+    const id = req.params.id;
+    const customerId = req.body.customer_id; 
+    const addressData = req.body.params;
 
     // Update the address using the Shopify API
-    const address = await shopify.customerAddress.update(addressId, addressData);
+    const address = await shopify.customerAddress.update(
+      customerId,
+      id,
+      addressData
+    );
 
-    res.json(address);
+    res.status(200).json(address);
+
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update address' });
+
+    console.log(error);
+    res.status(500).json({ error: "Failed to update address" });
+
   }
 }
 
-
 module.exports = {
+
   createAddress,
   getAddress,
+  getAllAddress,
   defaultAddress,
   deleteAddress,
-  updateAddress
-  };
+  updateAddress,
+
+};

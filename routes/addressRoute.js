@@ -9,6 +9,9 @@ router.post('/', addressController.createAddress);
 // Get an address by ID
 router.get('/:id', addressController.getAddress);
 
+// Get an all addresses by ID
+router.get('/getAll/:id', addressController.getAllAddress);
+
 // Update an address by ID
 router.put('/:id', addressController.updateAddress);
 
