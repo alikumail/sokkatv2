@@ -3,19 +3,19 @@ const router = express.Router();
 
 const controller = require('../controllers/shippingController');
 
-// GET all shipping methods
-router.route('/getall/').get(controller.getAllShippingMethods);
+// GET all shippingServices
+router.route('/').get(controller.listCarrierServices);
 
-// GET a specific shipping method by id
-router.route('/:id').get(controller.getShippingMethodById);
+// GET a specific shippingService
+router.route('/:id').get(controller.getCarrierServices);
 
-// CREATE a new shipping method
-router.route('/').post(controller.createShippingMethod);
+// CREATE a new shippingService
+router.route('/').post(controller.createCarrierServices);
 
-// UPDATE a shipping method by id
-router.route('/:id').put(controller.updateShippingMethodById);
+// UPDATE a shippingService
+router.route('/:id').put(controller.updateCarrierService);
 
-// DELETE a shipping method by id
-router.route('/:id').delete(controller.deleteShippingMethodById);
+// DELETE a shippingService
+router.route('/:id').delete(controller.deleteCarrierServices);
 
 module.exports = router;

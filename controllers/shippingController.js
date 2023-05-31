@@ -1,82 +1,71 @@
+
+const shopify = require('../services/shopify')
 const Shipping = require('../models/Shipping');
 
-// GET all shipping methods
-const getAllShippingMethods = async (req, res) => {
-  try {
-    const shippingMethods = await Shipping.find();
-    res.status(200).json({ success: true, data: shippingMethods });
-  } catch (err) {
-    res.status(500).json({ success: false, error: 'Server error' });
-  }
-};
 
-// GET a specific shipping method by id
-const getShippingMethodById = async (req, res) => {
-  const { id } = req.params;
+// Create a Carrier Service
+async function createCarrierServices(req, res){
   try {
-    const shippingMethod = await Shipping.findById(id);
-    if (!shippingMethod) {
-      return res.status(404).json({ success: false, error: 'Shipping method not found' });
-    }
-    res.status(200).json({ success: true, data: shippingMethod });
-  } catch (err) {
-    res.status(500).json({ success: false, error: 'Server error' });
+    const newCarrierService = req.body;
+    const createdCarrierService = await shopify.carrierService.create(newCarrierService);
+    res.status(201).json(createdCarrierService );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to create the Carrier Service.' });
   }
-};
+}
 
-// CREATE a new shipping method
-const createShippingMethod = async (req, res) => {
-  const { name, description, price, isActive } = req.body;
+// Delete a Carrier Service
+async function deleteCarrierServices(req, res){
   try {
-    const newShippingMethod = await Shipping.create({
-      name,
-      description,
-      price,
-      isActive,
-    });
-    res.status(201).json({ success: true, data: newShippingMethod });
-  } catch (err) {
-    res.status(400).json({ success: false, error: 'Invalid data' });
+    const { id } = req.params;
+    await shopify.carrierService.delete(id);
+    res.status(200).json({ message: 'Carrier Service deleted successfully.' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to delete the Carrier Service.' });
   }
-};
+}
 
-// UPDATE a shipping method by id
-const updateShippingMethodById = async (req, res) => {
-  const { id } = req.params;
-  const { name, description, price, isActive } = req.body;
+// Get a specific Carrier Service
+async function getCarrierServices(req, res){
   try {
-    const updatedShippingMethod = await Shipping.findByIdAndUpdate(
-      id,
-      { name, description, price, isActive },
-      { new: true }
-    );
-    if (!updatedShippingMethod) {
-      return res.status(404).json({ success: false, error: 'Shipping method not found' });
-    }
-    res.status(200).json({ success: true, data: updatedShippingMethod });
-  } catch (err) {
-    res.status(400).json({ success: false, error: 'Invalid data' });
+    const { id } = req.params;
+    const carrierService = await shopify.carrierService.get(id);
+    res.status(200).json( carrierService );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to retrieve the Carrier Service.' });
   }
-};
+}
 
-// DELETE a shipping method by id
-const deleteShippingMethodById = async (req, res) => {
-  const { id } = req.params;
+// Get a list of Carrier Services
+async function listCarrierServices(req, res){
   try {
-    const deletedShippingMethod = await Shipping.findByIdAndDelete(id);
-    if (!deletedShippingMethod) {
-      return res.status(404).json({ success: false, error: 'Shipping method not found' });
-    }
-    res.status(200).json({ success: true, data: deletedShippingMethod });
-  } catch (err) {
-    res.status(500).json({ success: false, error: 'Server error' });
+    const carrierServices = await shopify.carrierService.list();
+    res.status(200).json(carrierServices );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to retrieve the Carrier Services.' });
   }
-};
+}
+
+// Update a Carrier Service
+async function updateCarrierService(req, res) {
+  try {
+    const { id } = req.params;
+    const updatedCarrierService = await shopify.carrierService.update(id, req.body);
+    res.status(200).json(updatedCarrierService );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to update the Carrier Service.' });
+  }
+}
 
 module.exports = {
-  getAllShippingMethods,
-  getShippingMethodById,
-  createShippingMethod,
-  updateShippingMethodById,
-  deleteShippingMethodById,
-};
+  createCarrierServices,
+  updateCarrierService,
+  listCarrierServices,
+  getCarrierServices,
+  deleteCarrierServices
+}
