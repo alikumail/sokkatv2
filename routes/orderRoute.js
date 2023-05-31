@@ -1,17 +1,24 @@
 const express = require("express");
 const router = express.Router();
+
 const controller = require('../controllers/orderController');
 
-// new order 
-router.route('/add').post(controller.createOrder);
+//-------------------- new order ---------------------//
+router.route('/').post(controller.createOrder);
 
-// get orders from shopify store
-router.route('/:id').get(controller.getOrders);
+//------------------- get order --------------// 
+router.route('/:id').get(controller.getOrder);
 
-// cancel order in shopify store
-router.route('/:orderId/cancel').put(controller.cancelOrder);
+//---------------- cancel order ---------------------//
+router.route('/:id/cancel').put(controller.cancelOrder);
 
-// delete order from shopify store and mongodb
-router.route('/:orderId').delete(controller.deleteOrder);
+//--------------- delete order ---------------------//
+router.route('/:id').delete(controller.deleteOrder);
+
+//--------------- update order ---------------------//
+router.route('/:id').put(controller.updateOrder);
+
+//--------------- orders list ---------------------//
+router.route('/customer/:id').get(controller.listOrder);
 
 module.exports = router;

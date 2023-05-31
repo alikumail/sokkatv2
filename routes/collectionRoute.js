@@ -1,21 +1,31 @@
 const express = require('express');
-const cartController = require('../controllers/cartController');
+const controller = require('../controllers/collectionController');
 
 const router = express.Router();
 
-// Add an item to the cart
-router.post('/', cartController.addCart);
+//------------------------ Create custom collection --------------------------// ok
+router.route('/').post(controller.createCollection);
 
-// Get the cart contents
-router.get('/', cartController.getCart);
+//----------------------- add Product to collection --------------------------// ok
+router.route('/:collectionId/product/:productId').post(controller.addItemToCollection);
 
-// Update the quantity of an item in the cart
-router.put('/:itemId', cartController.updateCart);
+//----------------------- remove Product from collection ---------------------// ok
+router.route('/:collectionId/product/:productId/remove').delete(controller.removeItemFromCollection);
 
-// Remove an item from the cart
-// router.delete('/:itemId', cartController.removeCartItem);
+//------------------------- Update custom collection -------------------------// ok
+router.route('/:id').put(controller.updateCollection);
 
-// Clear the entire cart
-router.delete('/', cartController.deleteCart);
+//------------------------- Get list of collections --------------------------// ok
+router.route('/').get(controller.list);
+
+//-------------------------- Get single collection ---------------------------// ok
+router.route('/:id').get(controller.getSingleCollection);
+
+//------------------------ Get single collection Products --------------------// ok
+router.route('/:id/products').get(controller.getProducts);
+
+//--------------------- delete collection  -----------------------------------// ok
+router.route('/:id').delete(controller.deleteCollection);
+
 
 module.exports = router;

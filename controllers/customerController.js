@@ -1,35 +1,41 @@
-const errorHandler = require("../middleware/errorHandler");
 
 const Customer = require("../models/Customer");
 const Profile = require("../models/Profile");
 const OTP = require("../models/OTP");
 const shopify = require("../services/shopify");
+const phoneValidator = require('../utils/phone');
 
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
-// Login Api for customer -----------------------------//
+//----------------------- Login Api for customer ---------------------------//
+
 async function loginCustomer(req, res, next) {
   try {
-    // getting info from body
     const { phone, password, device_id, device_type, language } = req.body;
+    if(!phone || !password || !device_id || !device_type){
+      res.status(404).json('Information is missing');
+    }
+    // phone number validation
+    if(!phoneValidator.validatePhoneNumber(phone)){
+      res.status(422).json({error:'Provide Valid phone "+xxxxxxxxxxx" '});
+    }
 
     // Find the customer by phone number
     const customer = await Customer.findOne({ phone });
-
     // If the customer doesn't exist, return an error
     if (!customer) {
       return res.status(404).json({ error: "customer not found" });
     }
 
-    // Compare the provided password with the hashed password stored in the database
-    const isMatch = await bcrypt.compare(password, customer.password);
+    const isMatch = await bcrypt.compare(password, customer.password); // Compare the provided password
 
     // If the passwords match, return a success message
     if (isMatch) {
       customer.device_id = device_id;
+      customer.device_type = device_type;
       await customer.save();
-      return res.json({ message: "Login successful" });
+      return res.status(200).json({ message: "Login successful" });
     }
 
     // If the passwords don't match, return an error
@@ -39,7 +45,8 @@ async function loginCustomer(req, res, next) {
   }
 }
 
-// register new customer ---------------------------------------// ok
+//---------------------------- register new customer ---------------------------// ok
+
 async function registerCustomer(req, res, next) {
   try {
     // Get the customer data from the request body
@@ -47,32 +54,24 @@ async function registerCustomer(req, res, next) {
 
     // check if data exist
     if (
-      !firstName ||
-      !lastName ||
-      !email ||
-      !phone ||
-      !password ||
-      !device_id ||
-      !device_type ||
-      !language
+      !firstName || !lastName || !email || !phone || !password || !device_id || !device_type || !language ||
+      !phoneValidator.validatePhoneNumber(phone)
     ) {
-
       return next(
-        res.status(402).json("Information is Missing", "Missing Data Error", 404)
+        res.status(402).json("Information is Missing, format Data Error", 404)
       );
 
     }
-
     // creating customer in shopify store
     const shopifyCustomer = await shopify.customer.create({
       first_name: firstName,
       last_name: lastName,
       email: email,
+      phone: phone,
     });
 
     // HAshing the password
     const code = bcrypt.hashSync(password, 7);
-
     // check if customer already exist
     const check = await Customer.findOne({ phone });
     if (check) {
@@ -93,9 +92,7 @@ async function registerCustomer(req, res, next) {
     });
 
     await customer.save();
-
     res.status(200).json(customer);
-
   } catch (err) {
     // Handle errors and send an error response
     console.error(err);
@@ -103,42 +100,45 @@ async function registerCustomer(req, res, next) {
   }
 }
 
-// update customer ----------------------------------- 
+//---------------------------- update customer ------------------------------------ // ok
+
 async function updateCustomer(req, res, next){
-  const customerId = req.params.id;
-  // const updateData = req.body;
-  const updateData = {
-    phone: 1234567890 // Replace with the phone number you want to add
-  };
 
   try {
+    const customerId = req.params.id;
+    const updateData = req.body.params;
 
+    if(!phoneValidator(updateData.phone)){
+      res.status(422).json({ error: 'Provide Valid phone "+xxxxxxxxxxx" ' });
+    }
     const updatedCustomer = await shopify.customer.update(customerId, updateData);
-    res.json(updatedCustomer);
+    res.status(200).json(updatedCustomer);
 
   } catch (error) {
 
-    console.error('Error updating customer:', error);
-    res.status(500).json({ error: 'Failed to update customer' });
+    console.error(error);
+    res.status(400).json({ error: 'Failed to update customer' });
 
   }
 }
 
-// reset password --------------------------------// 
+//-------------------------- reset password --------------------------------// 
+
 async function resetPassword(req, res, next) {
   const { code, phone, password, device_id, device_type, language } = req.body;
 
   try {
+    if(!phoneValidator(phone)){
+      res.status(422).json({ error: 'Provide Valid phone "+xxxxxxxxxxx" ' });
+    }
     // Find the customer by phone number
     const customer = await Customer.findOne({ phone });
-
-    // Find OTP model of the customer
-    const otp = await OTP.findOne({ phone });
-
     // If the customer doesn't exist, return an error
     if (!customer) {
-      return res.status(404).json({ error: "customer not found" });
+      return res.status(404).json({ error: "Database Error" });
     }
+    // Find OTP model of the customer
+    const otp = await OTP.findOne({ phone });
 
     // Compare the provided verification code with the one stored in the customer object
     if (otp.otp !== code) {
@@ -163,7 +163,8 @@ async function resetPassword(req, res, next) {
   }
 }
 
-// add profile information
+//--------------------- add profile information -----------------------// discussion about address, customer id is it shopify or not
+
 async function createProfile(req, res, next) {
   try {
     // Get the customer data from the request body
@@ -174,14 +175,9 @@ async function createProfile(req, res, next) {
       !customer_id ||
       !first_name ||
       !last_name ||
-      !address ||
-      !device_id ||
-      !device_type ||
-      !language
+      !address 
     ) {
-      return next(
-        new errorHandler("Information is Missing", "Missing Data Error", 400)
-      );
+        res.status(404).json("Information is Missing Missing Data Error", 400);
     }
     // Create the order on db
     const profile = new Profile({
@@ -203,7 +199,8 @@ async function createProfile(req, res, next) {
   }
 }
 
-// update profile
+//------------------------- update profile -------------------------//
+
 async function updateProfile(req, res, next) {
   try {
     const { id } = req.params; // Get the profile ID from the URL
@@ -232,7 +229,7 @@ async function updateProfile(req, res, next) {
 }
 
 
-// logout api -------------------------------// 
+//----------------------------- logout api -------------------------------// 
 async function logout(req, res, next) {
   try {
     const { phone, device_id } = req.body;
@@ -260,14 +257,31 @@ async function logout(req, res, next) {
   }
 }
 
-// get all customers ------------------------
+//---------------------------- get all customers -------------------------//
+
 async function getAll(req, res){
   const customers =await shopify.customer.list();
   res.json(customers);
 }
 
+//---------------------------- get customers by id -------------------------//
 
-// delete customer --------------------------
+async function getCustomer(req, res){
+  try{
+
+    const id = req.params.id;
+    const customer =await shopify.customer.get(id);
+    res.status(200).json(customer);
+  }catch(error){
+
+    console.log(error);
+    res.status(404).json("Customer not found")
+  }
+}
+
+
+//-------------------------- delete customer --------------------------//
+
 async function deleteCustomer(req, res){
   try{
 
@@ -277,17 +291,19 @@ async function deleteCustomer(req, res){
   }catch(error){
 
     console.log(error);
-    res.status(422).json("Customer not found")
+    res.status(404).json("Customer not found")
   }
   
 }
 
+//--------------------------- Exporting Functions ------------------------//
 
 module.exports = {
   registerCustomer,
   updateCustomer,
   deleteCustomer,
   getAll,
+  getCustomer,
   loginCustomer,
   resetPassword,
   logout,

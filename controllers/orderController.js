@@ -2,116 +2,87 @@ const shopify = require("../services/shopify");
 const Customer = require("../models/Customer");
 const Order = require("../models/Order");
 
-// Define a function to create a new order
-async function createOrder(req, res) {
+//------------------ Get a specific order --------------------- // ok
+async function getOrder(req, res){
   try {
-    // get data from body
-    const { customer_id, line_items, transactions, total_tax, currency  } = req.body;
-
-    // get customer from data base
-    const customer = await Customer.findById(customer_id);
-
-    // create order on shopify store
-    const shopifyOrder = await shopify.order.create({
-      line_items ,
-      transactions ,
-      total_tax ,
-      currency 
-    });
-
-    // save order details on mongodb
-    const order = new Order({
-      order_id: shopifyOrder.id,
-      shopify_id: customer.shopify_id,
-      customer_id: customer.id
-    });
-
-    await order.save();
-
-    return res.status(201).json(order);
-
+    const id = req.params.id;
+    const order = await shopify.order.get(id, {fields:"id,line_items,name,total_price"});
+    res.status(200).json( order );
   } catch (error) {
-
-    console.error(error);
-    return res.status(500).json({ error: "Failed to create order" });
-
+    console.log(error);
+    res.status(500).json({ error: 'Failed to retrieve the order.' });
   }
 }
 
-
-// get order from store
-async function getOrders(req, res, next) {
+//-------------------- Create a new order --------------------- // ok
+async function createOrder(req, res){
   try {
-    const id = req.params.id ;
-
-    let params = { limit: 1 };
-
-    const orders = await shopify.order.get(id);
-
-    res.status(200).json(orders);
-
-  } catch (err) {
-
-    console.error(err);
-    return res.status(500).json({ error: "Failed to get orders" });
-
-  }
-}
-
-// cancel order, set status to canceled
-async function cancelOrder(req, res, next){
-  try {
-    const { orderId } = req.params;
-
-    const canceledOrder = await shopify.order.cancel(orderId);
-
-    res.json(canceledOrder);
+    const newOrder = req.body;
+    const createdOrder = await shopify.order.create(newOrder);
+    res.status(201).json(createdOrder );
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to cancel order' });
+    console.log(error);
+    res.status(500).json({ error: 'Failed to create the order.' });
   }
 }
 
-// delete order 
-async function deleteOrder(req, res, next){
+//--------------------- Cancel an order --------------------- // ok
+async function cancelOrder(req, res){
   try {
-    const { orderId } = req.params;
-
-    await shopify.order.delete(orderId);
-
-    res.sendStatus(204);
-
+    const id = req.params.id;
+    const canceledOrder = await shopify.order.cancel(id);
+    res.status(200).json({ canceledOrder });
   } catch (error) {
-
-    console.error(error);
-    res.status(500).json({ error: 'Failed to delete order' });
-
+    console.log(error);
+    res.status(500).json({ error: 'Failed to cancel the order.' });
   }
 }
 
-// Update an order
-async function updateOrder(req, res, next){
+//--------------------- Delete an order ---------------------// ok
+ async function deleteOrder(req, res){
   try {
+    const id = req.params.id;
+    await shopify.order.delete(id);
+    res.status(200).json({ message: 'Order deleted successfully.' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to delete the order.' });
+  }
+}
 
-    const { orderId } = req.params;
-    const { orderUpdates } = req.body;
-
-    const updatedOrder = await shopify.order.update(orderId, orderUpdates);
-
+//--------------------- Update an order -----------------------// ok
+async function updateOrder(req, res){
+  try {
+    const id = req.params.id;
+    const updatedOrder = await shopify.order.update(id, req.body);
     res.status(200).json(updatedOrder);
-
   } catch (error) {
-
-    console.error(error);
-    res.status(500).json({ error: 'Failed to update order' });
-
+    console.log(error);
+    res.status(500).json({ error: 'Failed to update the order.' });
   }
 }
+
+//--------------------- list of orders -----------------------// ok
+async function listOrder(req, res){
+  try {
+    const id = req.params.id;
+    const list = await shopify.order.list({
+      customer_id: id,
+      fields: "created_at,id,name,total-price" // can add fields
+    });
+    res.status(200).json(list);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Try Again.' });
+  }
+}
+
 
 module.exports = {
   createOrder,
-  getOrders,
+  getOrder,
   cancelOrder,
   deleteOrder,
-  updateOrder
+  updateOrder,
+  listOrder
 };

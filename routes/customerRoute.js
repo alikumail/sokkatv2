@@ -20,8 +20,11 @@ router.route('/').post(controller.registerCustomer);
 // reset password
 router.route('/reset-password').post(controller.resetPassword);
 
-// get all customers
-router.route('/getAll').get(controller.getAll);
+// // get all customers
+// router.route('/').get(controller.getAll);
+
+// get customer by id
+router.route('/:id').get(controller.getCustomer);
 
 // update customer -------------------------------------- 
 router.route('/:id').put(controller.updateCustomer)
