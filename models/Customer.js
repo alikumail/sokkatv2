@@ -17,6 +17,7 @@ const customerSchema = new mongoose.Schema({
   },
   country: String,
   city: String,
+  notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Notification' }],
   device_id: {
     type: String
   },

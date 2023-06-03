@@ -1,7 +1,5 @@
 const shopify = require("../services/shopify");
 
-const Customer = require("../models/Customer");
-const Address = require("../models/Address");
 
 // create new address ----------------------------//ok
 async function createAddress(req, res) {

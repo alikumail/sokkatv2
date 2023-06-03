@@ -1,59 +1,65 @@
 const shopify = require("../services/shopify");
 const Customer = require("../models/Customer");
 const Cart = require("../models/Cart");
+const { param } = require("../routes/notificationRoute");
 
 
-// Create a discount code
-async function createDiscount (req, res) {
-    try {
-      const { code, discountAmount } = req.body;
-  
-      // Create the discount code
-      const discount = await shopify.discount.create({
-        code,
-        discountAmount,
-      });
-  
-      res.json({ discount });
-    } catch (error) {
-      console.error('Failed to create discount', error);
-      res.status(500).json({ error: 'Failed to create discount' });
-    }
-  };
- 
-  // Get a discount code by code
-  async function getDiscountByCode (req, res) {
-    try {
-      const { code } = req.params;
-  
-      // Get the discount code by code
-      const discount = await shopify.discount.get(code);
-  
-      res.json({ discount });
-    } catch (error) {
-      console.error('Failed to get discount', error);
-      res.status(500).json({ error: 'Failed to get discount' });
-    }
-  };
-  
-  // Delete a discount code by code
-  async function deleteDiscountByCode (req, res) {
-    try {
-      const { code } = req.params;
-  
-      // Delete the discount code by code
-      await shopify.discount.delete(code);
-  
-      res.json({ success: true });
-    } catch (error) {
-      console.error('Failed to delete discount', error);
-      res.status(500).json({ error: 'Failed to delete discount' });
-    }
-  };
+//-------------- list of price rules ------------------//
+async function listOfPriceRule(req, res, next){
+  try {
+    // Fetch the list of price rules
+    const priceRules = await shopify.priceRule.list({status : 'Active'});
+
+    res.status(200).json({ priceRules });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve price rules.' });
+  }
+}
+
+//-------------- get price rule by id ------------------//
+async function getPriceRule(req, res, next){
+  try{
+    const id = req.params.id;
+    const priceRule = await shopify.priceRule.get(id);
+    res.status(200).json(priceRule);
+  }catch(error){
+    console.log(error);
+    res.status(400).json('Internal Server Error');
+  }
+}
+
+
+//-------------- list of price rules ------------------//
+async function getDiscountList(req, res, next){
+  try{
+    const price_rule_id = req.params.id;
+    const listPriceRule = await shopify.discountCode.list(price_rule_id);
+    res.status(200).json(listPriceRule);
+  }catch(error){
+    console.log(error);
+    res.status(400).json('Internal Server Error, No PriceRule Found');
+  }
+}
+
+//-------------- list of price rules ------------------//
+async function getDiscount(req, res, next){
+  try{
+    const price_rule_id = req.params.ruleId;
+    const id = req.params.id;
+    const listPriceRule = await shopify.discountCode.get(price_rule_id,id);
+    res.status(200).json(listPriceRule);
+  }catch(error){
+    console.log(error);
+    res.status(400).json('Internal Server Error, No PriceRule Found');
+  }
+}
+
+
 
 
 module.exports = {
-  createDiscount,
-  getDiscountByCode,
-  deleteDiscountByCode,
+  listOfPriceRule,
+  getPriceRule,
+  getDiscountList,
+  getDiscount
   };

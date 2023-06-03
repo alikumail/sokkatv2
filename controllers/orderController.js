@@ -1,6 +1,5 @@
 const shopify = require("../services/shopify");
-const Customer = require("../models/Customer");
-const Order = require("../models/Order");
+
 
 //------------------ Get a specific order --------------------- // ok
 async function getOrder(req, res){

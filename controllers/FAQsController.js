@@ -1,114 +1,96 @@
-const shopify = require("../services/shopify");
-const FAQs = require("../models/FAQ");
 
-// Sample FAQs data
-const faqs=[
-    { id: 1, question: 'What is the return policy?', answer: 'Our return policy allows...' },
-    { id: 2, question: 'How do I track my order?', answer: 'To track your order, please...' },
-    { id: 3, question: 'What payment methods do you accept?', answer: 'We accept major credit cards...' },
-    // Add more FAQs as needed
-  ];
-  
+const FAQs = require("../models/FAQs");
 
-  // Get a FAQ by ID
-   async function getFAQById (req, res) {
-    try {
-      const { id } = req.params;
-      const faq = faqs.find((faq) => faq.id === parseInt(id));
-  
-      if (!faq) {
-        return res.status(404).json({ error: 'FAQ not found' });
-      }
-  
-      res.json({ faq });
-    } catch (error) {
-      console.error('Failed to get FAQ', error);
-      res.status(500).json({ error: 'Failed to get FAQ' });
+
+// GET /faqs
+ async function getAllFaqs (req, res){
+  try {
+
+    // Dummy data for example purposes
+    const faqs = await FAQs.getAllFaqs();
+
+    res.status(200).json(faqs);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve FAQs.' });
+  }
+};
+
+// GET /faqs/:id
+ async function getFaqById (req, res){
+  try {
+    const id = req.params.id;
+
+    const faq = await FAQs.findById(id);
+
+    if (!faq) {
+      return res.status(404).json({ error: 'FAQ not found.' });
     }
-  };
-  
-  // Create a new FAQ
-   async function createFAQ (req, res)  {
-    try {
-        const { question, answer } = req.body;
-    
-        // Generate a new ID for the FAQ
-        const id = faqs.length + 1;
-    
-        // Create the new FAQ object
-        const newFAQ = { id, question, answer };
-    
-        // Add the new FAQ to the list
-        faqs.push(newFAQ);
-    
-        res.json({ faq: newFAQ });
-      } catch (error) {
-        console.error('Failed to create FAQ', error);
-        res.status(500).json({ error: 'Failed to create FAQ' });
-      }
-  };
-  
-  // Update a FAQ by ID
-   async function updateFAQ (req, res)  {
-    try {
-      const { id } = req.params;
-      const { question, answer } = req.body;
-  
-      // Find the FAQ by ID
-      const faq = faqs.find((faq) => faq.id === parseInt(id));
-  
-      if (!faq) {
-        return res.status(404).json({ error: 'FAQ not found' });
-      }
-  
-      // Update the FAQ
-      faq.question = question;
-      faq.answer = answer;
-  
-      res.json({ faq });
-    } catch (error) {
-      console.error('Failed to update FAQ', error);
-      res.status(500).json({ error: 'Failed to update FAQ' });
+
+    res.status(200).json({faq});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to retrieve FAQ.' });
+  }
+};
+
+// POST /faqs
+ async function createFaq (req, res){
+  try {
+    const { question, answer } = req.body;
+
+    // Validate the request body
+    if (!question || !answer) {
+      return res.status(400).json({ error: 'Question and answer are required.' });
     }
-  };
-  
-  // Delete a FAQ by ID
-   async function deleteFAQ (req, res)  {
-    try {
-      const { id } = req.params;
-  
-      // Find the index of the FAQ by ID
-      const faqIndex = faqs.findIndex((faq) => faq.id === parseInt(id));
-  
-      if (faqIndex === -1) {
-        return res.status(404).json({ error: 'FAQ not found' });
-      }
-  
-      // Remove the FAQ from the list
-      faqs.splice(faqIndex, 1);
-  
-      res.json({ success: true });
-    } catch (error) {
-      console.error('Failed to delete FAQ', error);
-      res.status(500).json({ error: 'Failed to delete FAQ' });
+
+    const newFaq = await FAQs.create({ question, answer });
+
+    res.status(201).json(newFaq);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create FAQ.' });
+  }
+};
+
+// PUT /faqs/:id
+ async function updateFaq (req, res){
+  try {
+    const { id } = req.params;
+    const { question, answer } = req.body;
+
+    const updatedFaq = await FAQs.findByIdAndUpdate(id, { question, answer }, { new: true });
+
+    if (!updatedFaq) {
+      return res.status(404).json({ error: 'FAQ not found.' });
     }
-  };
-  
+
+    res.status(200).json(updatedFaq);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update FAQ.' });
+  }
+};
+
+// DELETE /faqs/:id
+ async function deleteFaq(req, res){
+  try {
+    const { id } = req.params;
+
+    const deletedFaq = await FAQs.findByIdAndDelete(id);
+
+    if (!deletedFaq) {
+      return res.status(404).json({ error: 'FAQ not found.' });
+    }
+
+    res.status(200).json(deletedFaq);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete FAQ.' });
+  }
+};
+
 
 module.exports = {
-  createFAQ,
-  getFAQById,
-  deleteFAQ,
-  updateFAQ,
+  createFaq,
+  getAllFaqs,
+  getFaqById,
+  updateFaq,
+  deleteFaq,
   };
-
-//   // Get all FAQs
-//    async functiongetAllFAQs (req, res)  {
-//     try {
-//       res.json({ faqs });
-//     } catch (error) {
-//       console.error('Failed to get FAQs', error);
-//       res.status(500).json({ error: 'Failed to get FAQs' });
-//     }
-//   };
-  

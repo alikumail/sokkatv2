@@ -1,21 +1,16 @@
 const express = require('express');
-const cartController = require('../controllers/cartController');
+const Controller = require('../controllers/discountController');
 
 const router = express.Router();
 
-// Add an item to the cart
-router.post('/', cartController.addCart);
+// Get List of PriceRules
+router.route('/pricerule').get(Controller.listOfPriceRule);
 
-// Get the cart contents
-router.get('/', cartController.getCart);
+// get discounts list
+router.route('/:id/list').get(Controller.getDiscountList);
 
-// Update the quantity of an item in the cart
-router.put('/:itemId', cartController.updateCart);
+// get discounts list
+router.route('/:id/pricerule/:ruleId').get(Controller.getDiscount);
 
-// Remove an item from the cart
-// router.delete('/:itemId', cartController.removeCartItem);
-
-// Clear the entire cart
-router.delete('/', cartController.deleteCart);
 
 module.exports = router;

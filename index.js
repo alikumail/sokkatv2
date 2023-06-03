@@ -15,6 +15,7 @@ const discountRoute = require('./routes/discountRoute');
 const collectionRoute = require('./routes/collectionRoute');
 const FAQsRoute = require('./routes/FAQsRoute');
 const shippingRoute = require('./routes/shippingRoute');
+const notificationRoute = require('./routes/notificationRoute');
 
 //--------- express app instantiation------------//
 const app = express();
@@ -45,6 +46,7 @@ app.use('/api/v1/shipping', shippingRoute);
 app.use('/api/v1/cart', cartRoute);
 app.use('/api/v1/discount', discountRoute);
 app.use('/api/v1/collection', collectionRoute);
+app.use('/api/v1/notification', notificationRoute);
 
 // app.use((req,res,next)=>{
 //   res.status(err.statusCode || 500).json({
