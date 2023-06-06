@@ -9,10 +9,10 @@ const phone = require('../services/phone.js');
 router.route('/login').post(controller.loginCustomer);
 
 // verify phone
-// router.route('/verify-phone').post(phone.verify);
+router.route('/verify-phone').post(controller.verifyPhone);
 
 // verify phone number to reset password
-// router.route('/verify-phone/reset').post(phone.verify)
+// router.route('/verify-phone/reset').post(controller.verify)
 
 // register new customer
 router.route('/').post(controller.registerCustomer);

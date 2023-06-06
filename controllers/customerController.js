@@ -4,9 +4,36 @@ const Profile = require("../models/Profile");
 const OTP = require("../models/OTP");
 const shopify = require("../services/shopify");
 const phoneValidator = require('../utils/phone');
-
+const unifonic = require("../services/unifonic")
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+
+
+//-----------------------Verify customer phone---------------------------//
+
+async function verifyPhone(req, res, next) {
+  try {
+    const { phone } = req.body;
+    if(!phone){
+      res.status(404).json('Information is missing');
+    }
+    // phone number validation
+    if(!phoneValidator.validatePhoneNumber(phone)){
+      res.status(422).json({error:'Provide Valid phone "+xxxxxxxxxxx" '});
+    }
+    const optres = await unifonic.sendOTP(phone);
+
+    if(optres.success)
+    {
+      return res.status(200).json({ message: "Code send scuessfully" });
+    } else {
+      return res.status(422).json({ message: "Code sent failed" });
+    }
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
 
 //----------------------- Login Api for customer ---------------------------//
 
@@ -309,4 +336,5 @@ module.exports = {
   logout,
   createProfile,
   updateProfile,
+  verifyPhone,
 };
