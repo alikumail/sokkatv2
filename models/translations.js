@@ -2,6 +2,24 @@ const translations = {
   en: {
     greeting: "Hello!",
     goodbye: "Goodbye!",
+    failedAddress: "Failed to create address",
+    optSuccess: "Code sent successfully",
+    optFailed: "Failed to send code",
+    missingData: "Missing information",
+    missingCustomer: "Customer not found",
+    provideValidPhone: "Provide a valid phone number '+ xxxxxxxxxxx'",
+    loginSuccess: "Login successful",
+    invalidPassword: "Invalid password",
+    customerExist: "Customer already exists",
+    customerCreationFailed: "Failed to create customer",
+    customerUpdateFailed: "Failed to update customer",
+    getOrderFailed: "Failed to retrieve order",
+    orderFailed: "Failed to create order",
+    cancelOrderFailed: "Failed to cancel order",
+    orderDeletedSuccess: "Order deleted successfully",
+    orderDeletedFailed: "Failed to delete order",
+    orderUpdateFailed: "Failed to update order",
+    networkErrorTryAgain: "Network error, please try again",
   },
   ar: {
     greeting: "مرحباً!",
@@ -23,8 +41,8 @@ const translations = {
     orderDeletedSuccess: "تم حذف الطلب بنجاح",
     orderDeletedFailed: "فشل حذف الطلب",
     orderUpdateFailed: "فشل تحديث الطلب",
-    networkErrorTryAgain: "خطأ في الشبكة حاول مرة أخرى"
+    networkErrorTryAgain: "خطأ في الشبكة حاول مرة أخرى",
   },
 };
 
-module.exports = translations ;
+module.exports = translations;
