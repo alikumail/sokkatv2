@@ -15,19 +15,19 @@ async function verifyPhone(req, res, next) {
   try {
     const { phone } = req.body;
     if(!phone){
-      res.status(404).json(translate("missingData",req.body.lang));
+      res.status(404).json(translate.translate("missingData",req.body.lang));
     }
     // phone number validation
     if(!phoneValidator.validatePhoneNumber(phone)){
-      res.status(422).json({error: translate("provideValidPhone",req.body.lang)});
+      res.status(422).json({error: translate.translate("provideValidPhone",req.body.lang)});
     }
     const optres = await unifonic.sendOTP(phone);
 
     if(optres.success)
     {
-      return res.status(200).json({ message: translate("optSuccess",req.body.lang)});
+      return res.status(200).json({ message: translate.translate("optSuccess",req.body.lang)});
     } else {
-      return res.status(422).json({ message: translate("optFailed",req.body.lang) });
+      return res.status(422).json({ message: translate.translate("optFailed",req.body.lang) });
     }
 
   } catch (err) {
@@ -41,18 +41,18 @@ async function loginCustomer(req, res, next) {
   try {
     const { phone, password, device_id, device_type, language } = req.body;
     if(!phone || !password || !device_id || !device_type){
-      res.status(404).json(translate("missingData",req.body.lang));
+      res.status(404).json(translate.translate("missingData",req.body.lang));
     }
     // phone number validation
     if(!phoneValidator.validatePhoneNumber(phone)){
-      res.status(422).json({error:translate("provideValidPhone",req.body.lang)});
+      res.status(422).json({error:translate.translate("provideValidPhone",req.body.lang)});
     }
 
     // Find the customer by phone number
     const customer = await Customer.findOne({ phone });
     // If the customer doesn't exist, return an error
     if (!customer) {
-      return res.status(404).json({ error:translate("missingCustomer",req.body.lang) });
+      return res.status(404).json({ error:translate.translate("missingCustomer",req.body.lang) });
     }
 
     const isMatch = await bcrypt.compare(password, customer.password); // Compare the provided password
@@ -62,11 +62,11 @@ async function loginCustomer(req, res, next) {
       customer.device_id = device_id;
       customer.device_type = device_type;
       await customer.save();
-      return res.status(200).json({ message: translate("loginSuccess",req.body.lang)  });
+      return res.status(200).json({ message: translate.translate("loginSuccess",req.body.lang)  });
     }
 
     // If the passwords don't match, return an error
-    return res.status(401).json({ error: translate("invalidPassword",req.body.lang)   });
+    return res.status(401).json({ error: translate.translate("invalidPassword",req.body.lang)   });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -85,7 +85,7 @@ async function registerCustomer(req, res, next) {
       !phoneValidator.validatePhoneNumber(phone)
     ) {
       return next(
-        res.status(402).json(translate("missingData",req.body.lang)  , 404)
+        res.status(402).json(translate.translate("missingData",req.body.lang)  , 404)
       );
 
     }
@@ -102,7 +102,7 @@ async function registerCustomer(req, res, next) {
     // check if customer already exist
     const check = await Customer.findOne({ phone });
     if (check) {
-      res.status(400).json({ error: translate("customerExist",req.body.lang)   });
+      res.status(400).json({ error: translate.translate("customerExist",req.body.lang)   });
     }
 
     // Create the order on the Shopify store
@@ -123,7 +123,7 @@ async function registerCustomer(req, res, next) {
   } catch (err) {
     // Handle errors and send an error response
     console.error(err);
-    res.status(400).json({ error: translate("customerCreationFailed",req.body.lang) });
+    res.status(400).json({ error: translate.translate("customerCreationFailed",req.body.lang) });
   }
 }
 
@@ -136,7 +136,7 @@ async function updateCustomer(req, res, next){
     const updateData = req.body.params;
 
     if(!phoneValidator(updateData.phone)){
-      res.status(422).json({ error: translate("provideValidPhone",req.body.lang) });
+      res.status(422).json({ error: translate.translate("provideValidPhone",req.body.lang) });
     }
     const updatedCustomer = await shopify.customer.update(customerId, updateData);
     res.status(200).json(updatedCustomer);
@@ -144,7 +144,7 @@ async function updateCustomer(req, res, next){
   } catch (error) {
 
     console.error(error);
-    res.status(400).json({ error: translate("customerUpdateFailed",req.body.lang) });
+    res.status(400).json({ error: translate.translate("customerUpdateFailed",req.body.lang) });
 
   }
 }
