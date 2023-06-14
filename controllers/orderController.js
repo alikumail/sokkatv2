@@ -1,5 +1,5 @@
 const shopify = require("../services/shopify");
-
+const translate = require('../services/translatoinService');
 
 //------------------ Get a specific order --------------------- // ok
 async function getOrder(req, res){
@@ -9,7 +9,7 @@ async function getOrder(req, res){
     res.status(200).json( order );
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Failed to retrieve the order.' });
+    res.status(500).json({ message: translate("getOrderFailed", req.body.lang) });
   }
 }
 
@@ -21,7 +21,7 @@ async function createOrder(req, res){
     res.status(201).json(createdOrder );
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Failed to create the order.' });
+    res.status(500).json({ error: translate("orderFailed",req.body.lang) });
   }
 }
 
@@ -33,7 +33,7 @@ async function cancelOrder(req, res){
     res.status(200).json({ canceledOrder });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Failed to cancel the order.' });
+    res.status(500).json({ error: translate("cancelOrderFailed",req.body.lang) });
   }
 }
 
@@ -42,10 +42,10 @@ async function cancelOrder(req, res){
   try {
     const id = req.params.id;
     await shopify.order.delete(id);
-    res.status(200).json({ message: 'Order deleted successfully.' });
+    res.status(200).json({ message: translate("orderDeletedSuccess",req.body.lang) });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Failed to delete the order.' });
+    res.status(500).json({ error: translate("orderDeletedFailed",req.body.lang) });
   }
 }
 
@@ -57,7 +57,7 @@ async function updateOrder(req, res){
     res.status(200).json(updatedOrder);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Failed to update the order.' });
+    res.status(500).json({ error: translate("orderUpdateFailed",req.body.lang) });
   }
 }
 
@@ -72,7 +72,7 @@ async function listOrder(req, res){
     res.status(200).json(list);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Try Again.' });
+    res.status(500).json({ error: translate("networkErrorTryAgain",req.body.lang) });
   }
 }
 
