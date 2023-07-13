@@ -73,3 +73,5 @@ app.post('/api/forget-password', (req, res) => {
 
 api/phone-verification
 const { verification_code, device_id, device_type } = req.body;
+
+testing
