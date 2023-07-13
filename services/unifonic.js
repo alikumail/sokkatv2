@@ -14,7 +14,7 @@ const UserModel = require("../models/Customer");
              specialChars: false,
              lowerCaseAlphabets: false,
          });
-         
+        
          await axios.post('http://basic.unifonic.com/rest/SMS/messages', {
             AppSid: process.env.APP_SID,
             SenderID: process.env.SENDER_ID,

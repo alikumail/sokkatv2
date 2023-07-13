@@ -9,7 +9,7 @@ router.route('/pricerule').get(Controller.listOfPriceRule);
 // get discounts list
 router.route('/:id/list').get(Controller.getDiscountList);
 
-// get discounts list
+// get discount
 router.route('/:id/pricerule/:ruleId').get(Controller.getDiscount);
 
 

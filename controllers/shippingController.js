@@ -31,6 +31,7 @@ async function deleteCarrierServices(req, res){
 async function getCarrierServices(req, res){
   try {
     const { id } = req.params;
+    const { delivery_country } = req.body;
     const carrierService = await shopify.carrierService.get(id);
     res.status(200).json( carrierService );
   } catch (error) {

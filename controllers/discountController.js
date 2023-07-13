@@ -54,6 +54,20 @@ async function getDiscount(req, res, next){
   }
 }
 
+// discussion to remove price rule
+async function removeDiscountCode(req, res, next){
+  try{
+    const price_rule_id = req.params.ruleId;
+    const { customer_id, discount_code, discount_code_id } = req.body;
+    const listPriceRule = await shopify.discountCode.get(price_rule_id,id);
+    res.status(200).json(listPriceRule);
+  }catch(error){
+    console.log(error);
+    res.status(400).json('Internal Server Error, No PriceRule Found');
+  }
+}
+
+
 
 
 
@@ -61,5 +75,6 @@ module.exports = {
   listOfPriceRule,
   getPriceRule,
   getDiscountList,
-  getDiscount
+  getDiscount,
+  removeDiscountCode
   };

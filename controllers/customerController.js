@@ -10,10 +10,11 @@ const bcrypt = require("bcrypt");
 const translate = require('../services/translatoinService');
 
 //-----------------------Verify customer phone---------------------------//
-
 async function verifyPhone(req, res, next) {
   try {
     const { phone } = req.body;
+    // const { verification_code, device_id, device_type } = req.body;
+
     if(!phone){
       res.status(404).json(translate.translate("missingData",req.body.lang));
     }
@@ -35,11 +36,38 @@ async function verifyPhone(req, res, next) {
   }
 }
 
-//----------------------- Login Api for customer ---------------------------//
+//-----------------------Resend Code by Unifonic---------------------------//
+async function resendVerificationCode(req, res, next) {
+  try {
+    const { phone } = req.body;
+    // const { verification_code, device_id, device_type } = req.body;
 
+    if(!phone){
+      res.status(404).json(translate.translate("missingData",req.body.lang));
+    }
+    // phone number validation
+    if(!phoneValidator.validatePhoneNumber(phone)){
+      res.status(422).json({error: translate.translate("provideValidPhone",req.body.lang)});
+    }
+    const optres = await unifonic.reSendOTP(phone);
+
+    if(optres.success)
+    {
+      return res.status(200).json({ message: translate.translate("optSuccess",req.body.lang)});
+    } else {
+      return res.status(422).json({ message: translate.translate("optFailed",req.body.lang) });
+    }
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+//----------------------- Login Api for customer ---------------------------//
 async function loginCustomer(req, res, next) {
   try {
-    const { phone, password, device_id, device_type, language } = req.body;
+    const { phone, password, device_id, device_type } = req.body;
+
     if(!phone || !password || !device_id || !device_type){
       res.status(404).json(translate.translate("missingData",req.body.lang));
     }
@@ -73,15 +101,14 @@ async function loginCustomer(req, res, next) {
 }
 
 //---------------------------- register new customer ---------------------------// ok
-
 async function registerCustomer(req, res, next) {
   try {
     // Get the customer data from the request body
-    const { firstName,lastName,email,phone,country,city,password,device_id,device_type,language, } = req.body;
-
+    // const { verification_code, device_id, device_type } = req.body;
+    const { first_name, last_name, phone, email, password, city, country, device_id, device_type } = req.body;
     // check if data exist
     if (
-      !firstName || !lastName || !email || !phone || !password || !device_id || !device_type || !language ||
+      !first_name || !last_name || !email || !phone || !password || !device_id || !device_type || !language ||
       !phoneValidator.validatePhoneNumber(phone)
     ) {
       return next(
@@ -91,8 +118,8 @@ async function registerCustomer(req, res, next) {
     }
     // creating customer in shopify store
     const shopifyCustomer = await shopify.customer.create({
-      first_name: firstName,
-      last_name: lastName,
+      first_name: first_name,
+      last_name: last_name,
       email: email,
       phone: phone,
     });
@@ -129,11 +156,10 @@ async function registerCustomer(req, res, next) {
 
 //---------------------------- update customer ------------------------------------ // ok
 
-async function updateCustomer(req, res, next){
-
+async function updateProfile(req, res, next){
   try {
-    const customerId = req.params.id;
-    const updateData = req.body.params;
+  
+    const { shopify_customer_id, email, first_name, last_name, address } = req.body;
 
     if(!phoneValidator(updateData.phone)){
       res.status(422).json({ error: translate.translate("provideValidPhone",req.body.lang) });
@@ -152,9 +178,10 @@ async function updateCustomer(req, res, next){
 //-------------------------- reset password --------------------------------// 
 
 async function resetPassword(req, res, next) {
-  const { code, phone, password, device_id, device_type, language } = req.body;
+  const { phone, verification_code, password } = req.body;
 
   try {
+    // checking phone number syntax
     if(!phoneValidator(phone)){
       res.status(422).json({ error: 'Provide Valid phone "+xxxxxxxxxxx" ' });
     }
@@ -168,7 +195,7 @@ async function resetPassword(req, res, next) {
     const otp = await OTP.findOne({ phone });
 
     // Compare the provided verification code with the one stored in the customer object
-    if (otp.otp !== code) {
+    if (otp.otp !== verification_code) {
       return res.status(401).json({ error: "Invalid verification code" });
     }
 
@@ -230,11 +257,11 @@ async function createProfile(req, res, next) {
 
 async function updateProfile(req, res, next) {
   try {
-    const { id } = req.params; // Get the profile ID from the URL
-    const params = req.body; // Get the updated data from the request body
+    const { shopify_customer_id, email, first_name, last_name, address } = req.body;
+     // Get the updated data from the request body
 
     // Find the profile by ID
-    const profile = await Profile.findById(id);
+    const profile = await Profile.findById(shopify_customer_id);
 
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
@@ -259,7 +286,7 @@ async function updateProfile(req, res, next) {
 //----------------------------- logout api -------------------------------// 
 async function logout(req, res, next) {
   try {
-    const { phone, device_id } = req.body;
+    const { device_id } = req.body;
 
     // Find the customer based on the phone number
     const customer = await Customer.findOne({ phone });
@@ -284,19 +311,11 @@ async function logout(req, res, next) {
   }
 }
 
-//---------------------------- get all customers -------------------------//
-
-async function getAll(req, res){
-  const customers =await shopify.customer.list();
-  res.json(customers);
-}
-
 //---------------------------- get customers by id -------------------------//
-
-async function getCustomer(req, res){
+async function getProfileDetails(req, res){
   try{
 
-    const id = req.params.id;
+    const id = req.params.customer_id;
     const customer =await shopify.customer.get(id);
     res.status(200).json(customer);
   }catch(error){
@@ -306,9 +325,7 @@ async function getCustomer(req, res){
   }
 }
 
-
 //-------------------------- delete customer --------------------------//
-
 async function deleteCustomer(req, res){
   try{
 
@@ -327,10 +344,10 @@ async function deleteCustomer(req, res){
 
 module.exports = {
   registerCustomer,
-  updateCustomer,
+  updateProfile,
   deleteCustomer,
-  getAll,
-  getCustomer,
+  resendVerificationCode,
+  getProfileDetails,
   loginCustomer,
   resetPassword,
   logout,

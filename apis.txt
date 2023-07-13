@@ -1,0 +1,75 @@
+api/getProfileDetails?customer_id=5333425127520
+
+api/createOrderNew
+const requestBody = req.body;
+
+api/createordertest
+const requestBody = req.body;
+
+api/shipping_rate
+
+api/remove_discount
+const { customer_id, discount_code, discount_code_id } = req.body;
+
+api/order-status?order_id=4128113721440
+const { order_id } = req.query;
+
+api/contactUs/
+const { email, full_name, subject, message } = req.body;
+
+api/get-faqs
+api/getCards
+api/removeCard
+const { id } = req.body.gift_card;
+
+api/verifyDiscountCode?discount_code=alitest&customer_id=5333425127520
+const { discount_code, customer_id } = req.query;
+
+api/create-card
+const { shopify_customer_id, points } = req.body;
+
+api/save-fav
+const { cust_id, product_id } = req.body;
+
+api/get-fav
+const { cust_id } = req.body;
+
+api/remove-fav
+const { product_id, cust_id } = req.body;
+
+api/addProduct
+const { customer_id, device_id, items } = req.body;
+
+api/updateCart
+const { quantity, variant_id, customer_id, device_id } = req.body;
+
+api/deleteProductFromCart
+const { quantity, variant_id, customer_id, device_id } = req.body;
+
+api/getCart
+ const { customer_id, device_id } = req.body;
+
+api/resetpassword
+const { phone, verification_code, password } = req.body;
+
+api/sms 
+const { AppSid, SenderID, Recipient, Body } = req.body;
+
+// Endpoint for Send Push Notification
+app.post('/crmapi/public/api/add-participant', (req, res) => {
+  const { title, message, body, token, recipient } = req.body;
+
+// Endpoint for Get Notifications List
+app.post('/api/get-notifications', (req, res) => {
+  const { recipient } = req.body;
+
+// Endpoint for Get Notification Details
+app.post('/api/get-notifications-details', (req, res) => {
+  const { id } = req.body;
+
+// Endpoint for Reset Phone Verification
+app.post('/api/forget-password', (req, res) => {
+  const { phone } = req.body;
+
+api/phone-verification
+const { verification_code, device_id, device_type } = req.body;

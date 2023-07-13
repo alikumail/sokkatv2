@@ -6,11 +6,92 @@ const Cart = require("../models/Cart");
 async function addCart(req, res){
     try {
         const cartData = req.body; // Assuming the request body contains the cart data
-    
-        // Create the cart using the Shopify API
-        const cart = await shopify.cart.create(cartData);
-    
-        res.json(cart);
+        const query = 
+        `mutation {
+          cartCreate(
+            input: {
+              lines: [
+                {
+                  quantity: 1
+                  merchandiseId: "gid://shopify/ProductVariant/44996401922354"
+                }
+              ],
+              # The information about the buyer that's interacting with the cart.
+              buyerIdentity: {
+                email: "enggkumail@gmail.com",
+                countryCode: UAE,
+                # An ordered set of delivery addresses associated with the buyer that's interacting with the cart. The rank of the preferences is determined by the order of the addresses in the array. You can use preferences to populate relevant fields in the checkout flow.
+                deliveryAddressPreferences: {
+                  deliveryAddress: {
+                    address1: "150 Elgin Street",
+                    address2: "8th Floor",
+                    city: "Dubai",
+                    province: "Dubai",
+                    country: "UAE",
+                    zip: "K2P 1L4"
+                  },
+                }
+              }
+              attributes: {
+                key: "cart_attribute",
+                value: "This is a cart attribute"
+              }
+            }
+          ) {
+            cart {
+              id
+              createdAt
+              updatedAt
+              lines(first: 10) {
+                edges {
+                  node {
+                    id
+                    merchandise {
+                      ... on ProductVariant {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+              buyerIdentity {
+                deliveryAddressPreferences {
+                  __typename
+                }
+              }
+              attributes {
+                key
+                value
+              }
+              # The estimated total cost of all merchandise that the customer will pay at checkout.
+              cost {
+                totalAmount {
+                  amount
+                  currencyCode
+                }
+                # The estimated amount, before taxes and discounts, for the customer to pay at checkout.
+                subtotalAmount {
+                  amount
+                  currencyCode
+                }
+                # The estimated tax amount for the customer to pay at checkout.
+                totalTaxAmount {
+                  amount
+                  currencyCode
+                }
+                # The estimated duty amount for the customer to pay at checkout.
+                totalDutyAmount {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
+        }`;
+        shopify
+          .graphql(query)
+          .then((cart) => res.json(cart))
+          .catch((err) => console.error(err));
       } catch (error) {
         res.status(500).json({ error: 'Failed to create cart' });
       }

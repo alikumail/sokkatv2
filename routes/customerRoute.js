@@ -3,7 +3,7 @@ const router = express.Router();
 
 // import controllers
 const controller = require('../controllers/customerController');
-const phone = require('../services/phone.js');
+
 
 // login
 router.route('/login').post(controller.loginCustomer);
@@ -11,23 +11,26 @@ router.route('/login').post(controller.loginCustomer);
 // verify phone
 router.route('/verify-phone').post(controller.verifyPhone);
 
+// resend verify phone
+router.route('/resend-code').post(controller.resendVerificationCode);
+
 // verify phone number to reset password
 // router.route('/verify-phone/reset').post(controller.verify)
 
 // register new customer
-router.route('/').post(controller.registerCustomer);
+router.route('/register-customer').post(controller.registerCustomer);
 
 // reset password
-router.route('/reset-password').post(controller.resetPassword);
+router.route('/resetpassword').post(controller.resetPassword);
 
 // // get all customers
 // router.route('/').get(controller.getAll);
 
 // get customer by id
-router.route('/:id').get(controller.getCustomer);
+router.route('/getProfileDetails/:customer_id').get(controller.getProfileDetails);
 
 // update customer -------------------------------------- 
-router.route('/:id').put(controller.updateCustomer)
+router.route('/update-profile').put(controller.updateProfile)
 
 // delete customer -------------------------------------- 
 router.route('/:id').delete(controller.deleteCustomer)

@@ -30,8 +30,9 @@ async function getSingleCollection(req, res){
 
 async function getProducts(req, res){
   try {
-    const id = req.params.id ;
-    const products = await shopify.collection.products(id);
+    const { collection_id } = req.query;
+    // const id = req.params.id ;
+    const products = await shopify.collection.products(collection_id);
     res.status(200).json(products);
   } catch (error) {
     console.log(error);

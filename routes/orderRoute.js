@@ -4,7 +4,7 @@ const router = express.Router();
 const controller = require('../controllers/orderController');
 
 //-------------------- new order ---------------------//
-router.route('/').post(controller.createOrder);
+router.route('/createOrder').post(controller.createOrder);
 
 //------------------- get order --------------// 
 router.route('/:id').get(controller.getOrder);
@@ -19,6 +19,6 @@ router.route('/:id').delete(controller.deleteOrder);
 router.route('/:id').put(controller.updateOrder);
 
 //--------------- orders list ---------------------//
-router.route('/customer/:id').get(controller.listOrder);
+router.route('/recent-orders?customer_id').get(controller.listOrder);
 
 module.exports = router;

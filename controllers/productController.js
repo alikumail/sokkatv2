@@ -17,9 +17,11 @@ async function getAllProducts(req, res) {
 }
 
 // Get a product by ID
-async function getProductById(req, res) {
+async function getProductDetails(req, res) {
   try {
-    const id = req.params.id;
+    const id = req.body.formdata.find(item => item.key === 'product_id')?.value;
+    const lang = req.body.formdata.find(item => item.key === 'lang')?.value;
+
     const product = await shopify.product.get(id,{fields: "id,title,variants,images"});
 
     if (!product) {
@@ -37,6 +39,6 @@ async function getProductById(req, res) {
 module.exports = {
 
   getAllProducts,
-  getProductById,
+  getProductDetails,
 
 };

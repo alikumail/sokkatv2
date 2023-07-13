@@ -16,13 +16,13 @@ router.route('/:collectionId/product/:productId/remove').delete(controller.remov
 router.route('/:id').put(controller.updateCollection);
 
 //------------------------- Get list of collections --------------------------// ok
-router.route('/').get(controller.list);
+router.route('/getCollections').get(controller.list);
 
 //-------------------------- Get single collection ---------------------------// ok
 router.route('/:id').get(controller.getSingleCollection);
 
 //------------------------ Get single collection Products --------------------// ok
-router.route('/:id/products').get(controller.getProducts);
+router.route('/collectionProducts?collection_id').get(controller.getProducts);
 
 //--------------------- delete collection  -----------------------------------// ok
 router.route('/:id').delete(controller.deleteCollection);

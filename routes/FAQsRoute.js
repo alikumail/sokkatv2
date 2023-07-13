@@ -1,14 +1,11 @@
 const express = require('express');
 const router = express.Router();
-
 // Import the  Controller
 const Controller = require('../controllers/FAQsController');
+const contact = require('../controllers/contactUsController');
 
 // Define the routes
-router.get('/', Controller.getAllFaqs);
-router.get('/:id',  Controller.getFaqById);
-router.post('/',  Controller.createFaq);
-router.put('/:id',  Controller.updateFaq);
-router.delete('/:id',  Controller.deleteFaq);
+router.get('/get-faqs', Controller.getFaqs);
+router.post('/contactUs', contact.contactUs);
 
 module.exports = router;
